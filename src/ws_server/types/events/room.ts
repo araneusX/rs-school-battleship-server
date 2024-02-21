@@ -1,8 +1,8 @@
-import { Event } from './event.js';
+import { AppEvent } from './AppEvent.js';
 
-export type CreateRoomEvent = Event<'create_room'>;
+export type CreateRoomEvent = AppEvent<'create_room'>;
 
-export type AddUserToRoomEvent = Event<
+export type AddUserToRoomEvent = AppEvent<
   'add_user_to_room',
   {
     indexRoom: number;

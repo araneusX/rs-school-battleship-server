@@ -1,6 +1,6 @@
-import { Event } from './event.js';
+import { AppEvent } from './AppEvent.js';
 
-export type RegEvent = Event<
+export type RegEvent = AppEvent<
   'reg',
   {
     name: string;

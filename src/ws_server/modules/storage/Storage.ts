@@ -1,18 +1,16 @@
-import { v4 as uuid } from 'uuid';
-import { Storage as StorageType, StorageRecord } from '../../types.js';
-import { InternalError } from '../index.js';
-import { InternalErrorCodes, InternalErrorMessages } from '../../constants/index.js';
+import { Storage as StorageType, StorageRecord } from './types.js';
+import { uuid } from '../../utils/uuid.js';
 
-const globalStorage: Record<string, Map<string, unknown>> = {};
+const globalStorage: Record<string, Map<StorageRecord['id'], unknown>> = {};
 
 export abstract class Storage<TRecord extends StorageRecord> implements StorageType<TRecord> {
-  private storage: Map<string, TRecord>;
+  private storage: Map<TRecord['id'], TRecord>;
 
   constructor({ key }: { key: string }) {
     if (globalStorage[key]) {
-      this.storage = globalStorage[key] as Map<string, TRecord>;
+      this.storage = globalStorage[key] as Map<TRecord['id'], TRecord>;
     } else {
-      this.storage = new Map<string, TRecord>();
+      this.storage = new Map<TRecord['id'], TRecord>();
       globalStorage[key] = this.storage;
     }
   }
@@ -25,11 +23,11 @@ export abstract class Storage<TRecord extends StorageRecord> implements StorageT
     return data;
   }
 
-  updateItem(id: string, item: Partial<TRecord>) {
+  updateItem(id: TRecord['id'], item: Partial<TRecord>) {
     const data = this.storage.get(id);
 
     if (!data) {
-      throw new InternalError({ message: InternalErrorMessages.UserNotExist, code: InternalErrorCodes.ItemNotExist });
+      throw new Error('Storage/updateItem: Item does not exist');
     }
 
     const updatedData = { ...data, ...item, id };
@@ -38,7 +36,7 @@ export abstract class Storage<TRecord extends StorageRecord> implements StorageT
     return updatedData;
   }
 
-  getItemById(id: string) {
+  getItemById(id: TRecord['id']) {
     const data = this.storage.get(id);
 
     return data || null;
@@ -48,7 +46,7 @@ export abstract class Storage<TRecord extends StorageRecord> implements StorageT
     return Array.from(this.storage).map(([_, data]) => data);
   }
 
-  deleteItem(id: string) {
+  deleteItem(id: TRecord['id']) {
     this.storage.delete(id);
   }
 

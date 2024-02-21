@@ -57,20 +57,21 @@ const inviteUserToInteraction = () => {
 };
 
 export const logger = {
-  request: ({ method, port, url }: { port: number | string; url?: string; method?: string }) => {
+  log: (...messages: string[]) => {
     if (process.env.LOGGER) {
-      console.log('\x1b[93m%s\x1b[0m', `${method?.toUpperCase()} REQUEST -> SERVER:${port} | URL: ${url}`);
-    }
-  },
-  success: ({ result }: { result: string }) => {
-    if (process.env.LOGGER) {
-      console.log('\x1b[92m%s\x1b[0m', result);
+      console.log(...messages);
       inviteUserToInteraction();
     }
   },
-  error: ({ code, message }: { code: string | number; message: string }) => {
+  success: (...messages: string[]) => {
     if (process.env.LOGGER) {
-      console.log('\x1b[31m%s\x1b[0m', `Operation failed with code ${code}: ${message}`);
+      console.log('\x1b[92m%s\x1b[0m', ...messages);
+      inviteUserToInteraction();
+    }
+  },
+  error: (...messages: string[]) => {
+    if (process.env.LOGGER) {
+      console.log('\x1b[31m%s\x1b[0m', ...messages);
       inviteUserToInteraction();
     }
   },

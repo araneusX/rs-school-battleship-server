@@ -10,9 +10,12 @@ import {
   UpdateRoomMessage,
   UpdateWinnersMessage,
 } from '../messages/messages.js';
-import { Event } from './event.js';
+import { AppEvent } from './AppEvent.js';
 
-type MessageEvent<TMessage extends Message<string, unknown>> = Event<`message_${TMessage['type']}`, TMessage['data']>;
+type MessageEvent<TMessage extends Message<string, unknown>> = AppEvent<
+  `message_${TMessage['type']}`,
+  TMessage['data']
+>;
 
 export type RegMessageEvent = MessageEvent<RegMessage>;
 

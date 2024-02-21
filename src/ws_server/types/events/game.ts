@@ -1,6 +1,6 @@
-import { Event } from './event.js';
+import { AppEvent } from './AppEvent.js';
 
-export type AddShipEvent = Event<
+export type AddShipEvent = AppEvent<
   'add_ships',
   {
     gameId: number;
@@ -17,7 +17,7 @@ export type AddShipEvent = Event<
   }
 >;
 
-export type AttackEvent = Event<
+export type AttackEvent = AppEvent<
   'attack',
   {
     gameId: number;
@@ -27,7 +27,7 @@ export type AttackEvent = Event<
   }
 >;
 
-export type RandomAttackEvent = Event<
+export type RandomAttackEvent = AppEvent<
   'randomAttack',
   {
     gameId: number;
