@@ -1,9 +1,11 @@
-import { AppEvent } from './AppEvent.js';
+import { BaseEvent } from './general.js';
 
-export type RegEvent = AppEvent<
+export type RegEvent = BaseEvent<
   'reg',
   {
     name: string;
     password: string;
   }
 >;
+
+export type playerEvent = RegEvent;

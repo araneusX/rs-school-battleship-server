@@ -1,6 +1,6 @@
-import { Message } from './message.js';
+import { BaseMessage } from './general.js';
 
-export type RegMessage = Message<
+export type RegMessage = BaseMessage<
   'reg',
   {
     name: string;
@@ -10,7 +10,7 @@ export type RegMessage = Message<
   }
 >;
 
-export type UpdateWinnersMessage = Message<
+export type UpdateWinnersMessage = BaseMessage<
   'update_winners',
   {
     name: string;
@@ -18,16 +18,16 @@ export type UpdateWinnersMessage = Message<
   }[]
 >;
 
-export type AddUserToRoomMessage = Message<
+export type AddUserToRoomMessage = BaseMessage<
   'add_user_to_room',
   {
     indexRoom: number;
   }
 >;
 
-export type CreateGameMessage = Message<'create_game', { idGame: number; idPlayer: number }>;
+export type CreateGameMessage = BaseMessage<'create_game', { idGame: number; idPlayer: number }>;
 
-export type UpdateRoomMessage = Message<
+export type UpdateRoomMessage = BaseMessage<
   'update_room',
   {
     roomId: number;
@@ -38,7 +38,7 @@ export type UpdateRoomMessage = Message<
   }[]
 >;
 
-export type StartGameMessage = Message<
+export type StartGameMessage = BaseMessage<
   'start_game',
   {
     ships: {
@@ -55,7 +55,7 @@ export type StartGameMessage = Message<
   }
 >;
 
-export type AttackMessage = Message<
+export type AttackMessage = BaseMessage<
   'attack',
   {
     position: {
@@ -67,14 +67,14 @@ export type AttackMessage = Message<
   }
 >;
 
-export type TurnMessage = Message<
+export type TurnMessage = BaseMessage<
   'turn',
   {
     currentPlayer: number;
   }
 >;
 
-export type FinishMessage = Message<
+export type FinishMessage = BaseMessage<
   'finish',
   {
     winPlayer: number;

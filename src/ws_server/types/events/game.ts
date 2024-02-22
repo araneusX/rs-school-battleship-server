@@ -1,6 +1,6 @@
-import { AppEvent } from './AppEvent.js';
+import { BaseEvent } from './general.js';
 
-export type AddShipEvent = AppEvent<
+export type AddShipEvent = BaseEvent<
   'add_ships',
   {
     gameId: number;
@@ -17,7 +17,7 @@ export type AddShipEvent = AppEvent<
   }
 >;
 
-export type AttackEvent = AppEvent<
+export type AttackEvent = BaseEvent<
   'attack',
   {
     gameId: number;
@@ -27,10 +27,12 @@ export type AttackEvent = AppEvent<
   }
 >;
 
-export type RandomAttackEvent = AppEvent<
+export type RandomAttackEvent = BaseEvent<
   'randomAttack',
   {
     gameId: number;
     indexPlayer: number;
   }
 >;
+
+export type GameEvent = AddShipEvent | AttackEvent | RandomAttackEvent;

@@ -1,4 +1,4 @@
-import { Message } from '../messages/message.js';
+import { BaseMessage } from '../messages/general.js';
 import {
   AddUserToRoomMessage,
   AttackMessage,
@@ -10,9 +10,9 @@ import {
   UpdateRoomMessage,
   UpdateWinnersMessage,
 } from '../messages/messages.js';
-import { AppEvent } from './AppEvent.js';
+import { BaseEvent } from './general.js';
 
-type MessageEvent<TMessage extends Message<string, unknown>> = AppEvent<
+type MessageEvent<TMessage extends BaseMessage<string, unknown>> = BaseEvent<
   `message_${TMessage['type']}`,
   TMessage['data']
 >;
@@ -34,3 +34,14 @@ export type TurnMessageEvent = MessageEvent<TurnMessage>;
 export type FinishMessageEvent = MessageEvent<FinishMessage>;
 
 export type AddUserToRoomMessageEvent = MessageEvent<AddUserToRoomMessage>;
+
+export type WsEvent =
+  | RegMessageEvent
+  | UpdateWinnersMessageEvent
+  | CreateGameMessageEvent
+  | UpdateRoomMessageEvent
+  | StartGameMessageEvent
+  | AttackMessageEvent
+  | TurnMessageEvent
+  | FinishMessageEvent
+  | AddUserToRoomMessageEvent;

@@ -1,9 +1,6 @@
-import { AppEvent } from '../../types/events/AppEvent.js';
+import { UnknownEvent, AppEvent } from '../../types/events/index.js';
 import { SendToClient } from './types.js';
 
-export const wsReducer = (
-  events: AppEvent<string, unknown>[],
-  sendToClient: SendToClient,
-): (AppEvent<string, unknown> | void)[] => {
+export const wsReducer = (events: UnknownEvent[], sendToClient: SendToClient): (AppEvent | void)[] => {
   return events.map((event) => {});
 };

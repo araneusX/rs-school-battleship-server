@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import { uuid } from '../../utils/uuid.js';
 import { SETTINGS } from '../../settings.js';
+import { IncomeMessage, BaseMessage } from '../../types/index.js';
 
 type Connections = Map<number, { userId: number; connectionId: number }[]>;
 
@@ -26,9 +27,15 @@ server.on('connection', (socket) => {
 
   connection.on('message', (rawMessage) => {
     try {
-      const message = JSON.stringify(rawMessage.toString());
-      const parsedMessage = {};
-    } catch (error) {}
+      const message = JSON.parse(rawMessage.toString());
+
+      const parsedMessage = {
+        type: message.type,
+        data: JSON.parse(message.data),
+      } as IncomeMessage;
+    } catch (error) {
+      console.error(error);
+    }
   });
 });
 

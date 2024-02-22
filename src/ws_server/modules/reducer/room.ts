@@ -1,5 +1,5 @@
-import { AppEvent } from '../../types/events/AppEvent';
+import { AppEvent, UnknownEvent } from '../../types/events/index.js';
 
-export const roomReducer = (events: AppEvent<string, unknown>[]): (AppEvent<string, unknown> | void)[] => {
+export const roomReducer = (events: UnknownEvent[]): (AppEvent | void)[] => {
   return events.map((event) => {});
 };
