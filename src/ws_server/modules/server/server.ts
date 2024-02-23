@@ -1,22 +1,20 @@
 import WebSocket from 'ws';
-import { uuid } from '../../utils/uuid.js';
 import { SETTINGS } from '../../settings.js';
 import { IncomeMessage, BaseMessage } from '../../types/index.js';
-
-type Connections = Map<number, { userId: number; connectionId: number }[]>;
-
-type Users = Map<number, { userId: number; connectionId: number }>;
+import { auth } from '../auth/index.js';
+import { serialize } from '../../utils/index.js';
+import { logger } from '../index.js';
 
 type Connection = WebSocket & {
-  id?: number;
   isAlive?: boolean;
 };
 
-export const server = new WebSocket.Server({ port: SETTINGS.PORT });
+const userConnections = new Map<number, Set<Connection>>();
 
-server.on('connection', (socket) => {
+export const wsServer = new WebSocket.Server({ port: SETTINGS.PORT });
+
+wsServer.on('connection', (socket) => {
   const connection = socket as Connection;
-  connection.id = uuid();
   connection.isAlive = true;
 
   connection.on('pong', () => {
@@ -33,14 +31,58 @@ server.on('connection', (socket) => {
         type: message.type,
         data: JSON.parse(message.data),
       } as IncomeMessage;
+
+      if (parsedMessage.type === 'reg') {
+        const userId = (() => {
+          try {
+            return auth(parsedMessage.data);
+          } catch (error) {
+            connection.emit(
+              'message',
+              serialize({
+                type: 'reg',
+                data: {
+                  error: true,
+                  errorText: error instanceof Error ? error.message : 'An error has occurred',
+                  index: 0,
+                  name: parsedMessage.data.name,
+                },
+              }),
+            );
+
+            throw error;
+          }
+        })();
+
+        const userConnectionSet = userConnections.get(userId) ?? new Set();
+        userConnectionSet.add(connection);
+        userConnections.set(userId, new Set());
+
+        connection.emit(
+          'message',
+          serialize({
+            type: 'reg',
+            data: {
+              error: false,
+              errorText: '',
+              index: userId,
+              name: parsedMessage.data.name,
+            },
+          }),
+        );
+      }
     } catch (error) {
-      console.error(error);
+      if (error instanceof Error) {
+        logger.error(error.message);
+      }
     }
   });
 });
 
 const interval = setInterval(() => {
-  server.clients.forEach((socket) => {
+  console.log(userConnections);
+
+  wsServer.clients.forEach((socket) => {
     const connection = socket as Connection;
 
     if (connection.isAlive === false) {
@@ -53,6 +95,6 @@ const interval = setInterval(() => {
   });
 }, SETTINGS.TIMEOUT);
 
-server.on('close', () => {
+wsServer.on('close', () => {
   clearInterval(interval);
 });

@@ -3,7 +3,11 @@ import { uuid } from '../../utils/uuid.js';
 
 const globalStorage: Record<string, Map<StorageRecord['id'], unknown>> = {};
 
-export abstract class Storage<TRecord extends StorageRecord> implements StorageType<TRecord> {
+const checkSubType = <TRecord extends StorageRecord>(base: TRecord, item: Partial<TRecord>) => {
+  return Object.keys(item).every((property) => base[property as keyof TRecord] === item[property as keyof TRecord]);
+};
+
+export class Storage<TRecord extends StorageRecord> implements StorageType<TRecord> {
   private storage: Map<TRecord['id'], TRecord>;
 
   constructor({ key }: { key: string }) {
@@ -40,6 +44,16 @@ export abstract class Storage<TRecord extends StorageRecord> implements StorageT
     const data = this.storage.get(id);
 
     return data || null;
+  }
+
+  getItemMatch(fields: Partial<TRecord>) {
+    if (Object.hasOwn(fields, 'id')) {
+      const item = this.getItemById(fields.id as TRecord['id']);
+
+      return item && (checkSubType(item, fields) ? item : null);
+    }
+
+    return [...this.storage.values()].find((item) => checkSubType(item, fields)) ?? null;
   }
 
   getAllItems() {
