@@ -11,7 +11,6 @@
     "resolveJsonModule": true,
     "allowJs": true,
   },
-  "include": ["*.ts", "*.js"],
+  "include": ["*.ts", "*.js", "**/*.ts", "**/*.js"],
   "exclude": ["front/**/*"],
-  "files": ["index.ts"]
 }

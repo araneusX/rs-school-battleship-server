@@ -6,7 +6,7 @@ import { WsEvent } from './ws.js';
 export type BaseEvent<TType extends string, TData = undefined> = {
   type: TType;
   data: TData;
-  userId: number;
+  id: number;
 };
 
 export type UnknownEvent = BaseEvent<string, unknown>;

@@ -1,17 +1,29 @@
-import WebSocket from 'ws';
+import WebSocket, { WebSocketServer } from 'ws';
 import { SETTINGS } from '../../settings.js';
-import { IncomeMessage, BaseMessage } from '../../types/index.js';
+import { IncomeMessage, SendToClient } from '../../types/index.js';
 import { auth } from '../auth/index.js';
 import { serialize } from '../../utils/index.js';
 import { logger } from '../index.js';
+import { createReducer } from '../reducer/root.js';
 
 type Connection = WebSocket & {
   isAlive?: boolean;
+  userId?: number;
 };
 
 const userConnections = new Map<number, Set<Connection>>();
 
-export const wsServer = new WebSocket.Server({ port: SETTINGS.PORT });
+export const wsServer = new WebSocketServer({ port: SETTINGS.PORT });
+
+const sendToCLient: SendToClient = (message, privacy) => {
+  const clients = privacy
+    ? privacy.flatMap((userId) => [...(userConnections.get(userId) ?? [])])
+    : [...wsServer.clients];
+
+  clients.forEach((client) => client.send(serialize(message)));
+};
+
+const reducer = createReducer(sendToCLient);
 
 wsServer.on('connection', (socket) => {
   const connection = socket as Connection;
@@ -22,6 +34,13 @@ wsServer.on('connection', (socket) => {
   });
 
   connection.on('error', console.error);
+
+  connection.on('close', () => {
+    if (connection.userId !== undefined) {
+      const userConnectionSet = userConnections.get(connection.userId);
+      userConnectionSet?.delete(connection);
+    }
+  });
 
   connection.on('message', (rawMessage) => {
     try {
@@ -35,10 +54,11 @@ wsServer.on('connection', (socket) => {
       if (parsedMessage.type === 'reg') {
         const userId = (() => {
           try {
+            console.log('DATA: ', parsedMessage.data);
+
             return auth(parsedMessage.data);
           } catch (error) {
-            connection.emit(
-              'message',
+            connection.send(
               serialize({
                 type: 'reg',
                 data: {
@@ -56,10 +76,11 @@ wsServer.on('connection', (socket) => {
 
         const userConnectionSet = userConnections.get(userId) ?? new Set();
         userConnectionSet.add(connection);
-        userConnections.set(userId, new Set());
+        userConnections.set(userId, userConnectionSet);
 
-        connection.emit(
-          'message',
+        connection.userId = userId;
+
+        connection.send(
           serialize({
             type: 'reg',
             data: {
@@ -70,23 +91,34 @@ wsServer.on('connection', (socket) => {
             },
           }),
         );
+      } else if (connection.userId) {
+        reducer([
+          {
+            ...parsedMessage,
+            id: connection.userId,
+          },
+        ]);
       }
     } catch (error) {
       if (error instanceof Error) {
-        logger.error(error.message);
+        logger.error('Error:  ', error.message);
       }
     }
   });
 });
 
 const interval = setInterval(() => {
-  console.log(userConnections);
-
   wsServer.clients.forEach((socket) => {
     const connection = socket as Connection;
 
     if (connection.isAlive === false) {
       //TODO! IMPLEMENT CODE HERE
+
+      if (connection.userId !== undefined) {
+        const userConnectionSet = userConnections.get(connection.userId);
+        userConnectionSet?.delete(connection);
+      }
+
       return connection.terminate();
     }
 

@@ -2,7 +2,7 @@ import { AppEvent, UnknownEvent } from '../../types/events/general.js';
 import { gameReducer } from './game.js';
 import { playerReducer } from './player.js';
 import { roomReducer } from './room.js';
-import { SendToClient } from './types.js';
+import { SendToClient } from '../../types/index.js';
 import { wsReducer } from './ws.js';
 
 export const createReducer = (sendToClient: SendToClient) => {

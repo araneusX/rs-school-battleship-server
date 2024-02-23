@@ -1,5 +1,5 @@
-let counter = 0;
+let counter = 1;
 
 export const uuid = () => {
-  return ++counter;
+  return counter++;
 };
