@@ -26,3 +26,9 @@ export type Game = {
   ships: [ships?: Ships, ships?: Ships];
   fields: [field: Field, field: Field];
 };
+
+export type Winner = {
+  id: number;
+  userId: number;
+  wins: number;
+};

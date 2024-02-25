@@ -1,6 +1,7 @@
 import { GameEvent } from './game.js';
 import { RoomEvent } from './room.js';
 import { UserEvent } from './user.js';
+import { WinnersEvent } from './winners.js';
 
 export type BaseEvent<TType extends string, TData = undefined> = {
   type: TType;
@@ -16,6 +17,6 @@ export type RegEvent = BaseEvent<
   }
 >;
 
-export type UnknownEvent = BaseEvent<string, unknown | undefined>;
+export type UnknownEvent = BaseEvent<string, unknown | never>;
 
-export type AppEvent = GameEvent | RegEvent | RoomEvent | UserEvent;
+export type AppEvent = GameEvent | RegEvent | RoomEvent | UserEvent | WinnersEvent;

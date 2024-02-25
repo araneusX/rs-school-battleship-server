@@ -7,16 +7,23 @@ export const userReducer: ScopeReducer = (events) => {
   return reducerEvents.map((event) => {
     switch (event.type) {
       case 'user_joined':
-        return {
-          type: 'cast_room_info',
-          data: {
-            userIds: [event.id],
+        return [
+          {
+            type: 'cast_room_info',
+            data: {
+              userIds: [event.id],
+            },
+            id: event.id,
           },
-          id: event.id,
-        };
+          {
+            type: 'cast_winners_info',
+            id: event.id,
+          },
+        ];
       case 'user_left':
         return {
           type: 'remove_user_from_room',
+          data: undefined,
           id: event.id,
         };
       default:

@@ -15,6 +15,9 @@ export const roomReducer: ScopeReducer = (events, { sendToClient }) => {
           const room = roomStorage.addItem({
             users: [event.id],
           });
+
+          logger.log(`User id: ${event.id} created a room with id: ${room.id}`);
+
           return {
             type: 'cast_room_info',
             data: {
@@ -48,6 +51,8 @@ export const roomReducer: ScopeReducer = (events, { sendToClient }) => {
             ...room,
             users: [userInRoom, id],
           });
+
+          logger.log(`Add second user id: ${id} in the room id: ${event.data.indexRoom}`);
 
           return [
             {

@@ -1,3 +1,3 @@
 import { BaseEvent, UnknownEvent } from './events/general.js';
 
-export type ReducerEvents<TEvent extends UnknownEvent> = (TEvent | BaseEvent<never, never>)[];
+export type ReducerEvents<TEvent extends UnknownEvent> = TEvent[];
