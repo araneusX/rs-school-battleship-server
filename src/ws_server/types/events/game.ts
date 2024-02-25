@@ -1,5 +1,12 @@
 import { BaseEvent } from './general.js';
 
+export type CreateGameEvent = BaseEvent<
+  'create_game',
+  {
+    playerIds: [number, number];
+  }
+>;
+
 export type AddShipEvent = BaseEvent<
   'add_ships',
   {
@@ -35,4 +42,4 @@ export type RandomAttackEvent = BaseEvent<
   }
 >;
 
-export type GameEvent = AddShipEvent | AttackEvent | RandomAttackEvent;
+export type GameEvent = CreateGameEvent | AddShipEvent | AttackEvent | RandomAttackEvent;

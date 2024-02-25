@@ -1,24 +1,20 @@
 import { AppEvent, UnknownEvent } from '../../types/events/general.js';
 import { gameReducer } from './game.js';
-import { playerReducer } from './player.js';
 import { roomReducer } from './room.js';
 import { SendToClient } from '../../types/index.js';
-import { wsReducer } from './ws.js';
+import { userReducer } from './user.js';
 
 export const createReducer = (sendToClient: SendToClient) => {
-  const tools = {};
+  const utils = { sendToClient };
 
   const reducer = (events: UnknownEvent[]) => {
     if (!events.length) {
       return;
     }
 
-    const nextTickEvents = [
-      ...gameReducer(events),
-      ...playerReducer(events),
-      ...roomReducer(events),
-      ...wsReducer(events, sendToClient),
-    ].filter((event): event is AppEvent => !!event);
+    const nextTickEvents = [...gameReducer(events, utils), ...roomReducer(events, utils), userReducer(events, utils)]
+      .flat()
+      .filter((event): event is AppEvent => !!event);
 
     reducer(nextTickEvents);
   };

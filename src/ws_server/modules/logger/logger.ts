@@ -3,11 +3,18 @@ import { Storage } from '../storage/Storage.js';
 
 let isUserInteractionEnabled = false;
 
+const inviteUserToInteraction = () => {
+  isUserInteractionEnabled = true;
+  console.log('\x1b[36m%s\x1b[0m', 'Press ENTER if you want to print all data from the database.');
+};
+
 if (process.env.LOGGER) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
+
+  inviteUserToInteraction();
 
   rl.on('line', () => {
     try {
@@ -51,10 +58,6 @@ if (process.env.LOGGER) {
     rl.removeAllListeners();
   });
 }
-const inviteUserToInteraction = () => {
-  isUserInteractionEnabled = true;
-  console.log('\x1b[36m%s\x1b[0m', 'Press ENTER if you want to print all data from the database.');
-};
 
 export const logger = {
   log: (...messages: string[]) => {

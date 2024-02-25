@@ -56,6 +56,10 @@ export class Storage<TRecord extends StorageRecord> implements StorageType<TReco
     return [...this.storage.values()].find((item) => checkSubType(item, fields)) ?? null;
   }
 
+  findOne(filter: (item: TRecord) => boolean) {
+    return [...this.storage.values()].find(filter) ?? null;
+  }
+
   getAllItems() {
     return Array.from(this.storage).map(([_, data]) => data);
   }

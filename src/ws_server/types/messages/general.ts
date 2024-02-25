@@ -13,7 +13,6 @@ import {
 import {
   AddShipEvent,
   AddUserToRoomEvent,
-  AddUserToRoomMessageEvent,
   AttackEvent,
   CreateRoomEvent,
   RandomAttackEvent,
@@ -39,7 +38,6 @@ export type OutcomeMessage =
 export type IncomeMessage =
   | AddShipEvent
   | AddUserToRoomEvent
-  | AddUserToRoomMessageEvent
   | AttackEvent
   | CreateRoomEvent
   | RandomAttackEvent

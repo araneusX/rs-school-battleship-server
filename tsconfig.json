@@ -11,6 +11,6 @@
     "resolveJsonModule": true,
     "allowJs": true,
   },
-  "include": ["*.ts", "*.js", "**/*.ts", "**/*.js"],
+  "include": ["*.ts", "*.js", "**/*.ts", "**/*.js", "src/ws_server/modules/storage/storages"],
   "exclude": ["front/**/*"],
 }

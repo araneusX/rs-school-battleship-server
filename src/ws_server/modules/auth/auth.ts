@@ -1,15 +1,9 @@
 import { createHash } from 'crypto';
 import { RegEvent } from '../../types/index.js';
-import { Storage } from '../index.js';
-
-const users = new Storage<{
-  id: number;
-  name: string;
-  password: string;
-}>({ key: 'users' });
+import { authStorage } from '../index.js';
 
 export const auth = (data: RegEvent['data']) => {
-  const user = users.getItemMatch({ name: data.name });
+  const user = authStorage.getItemMatch({ name: data.name });
 
   const passwordHash = (() => {
     const hash = createHash('sha256');
@@ -18,7 +12,7 @@ export const auth = (data: RegEvent['data']) => {
   })();
 
   if (!user) {
-    return users.addItem({
+    return authStorage.addItem({
       name: data.name,
       password: passwordHash,
     }).id;

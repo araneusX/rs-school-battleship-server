@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "start": "tsx index.ts",
-        "start:dev": "tsx watch index.ts",
+        "start:dev": "export LOGGER=true || set LOGGER=true && tsx watch index.ts",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Andrei Auchynnikau & Alex Oleshkevich",

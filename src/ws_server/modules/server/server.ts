@@ -17,7 +17,9 @@ export const wsServer = new WebSocketServer({ port: SETTINGS.PORT });
 
 const sendToCLient: SendToClient = (message, privacy) => {
   const clients = privacy
-    ? privacy.flatMap((userId) => [...(userConnections.get(userId) ?? [])])
+    ? privacy
+        .filter((userId): userId is number => typeof userId === 'number')
+        .flatMap((userId) => [...(userConnections.get(userId) ?? [])])
     : [...wsServer.clients];
 
   clients.forEach((client) => client.send(serialize(message)));
@@ -54,8 +56,6 @@ wsServer.on('connection', (socket) => {
       if (parsedMessage.type === 'reg') {
         const userId = (() => {
           try {
-            console.log('DATA: ', parsedMessage.data);
-
             return auth(parsedMessage.data);
           } catch (error) {
             connection.send(
@@ -80,17 +80,13 @@ wsServer.on('connection', (socket) => {
 
         connection.userId = userId;
 
-        connection.send(
-          serialize({
-            type: 'reg',
-            data: {
-              error: false,
-              errorText: '',
-              index: userId,
-              name: parsedMessage.data.name,
-            },
-          }),
-        );
+        reducer([
+          {
+            type: 'user_joined',
+            data: undefined,
+            id: connection.userId,
+          },
+        ]);
       } else if (connection.userId) {
         reducer([
           {
@@ -117,6 +113,14 @@ const interval = setInterval(() => {
       if (connection.userId !== undefined) {
         const userConnectionSet = userConnections.get(connection.userId);
         userConnectionSet?.delete(connection);
+
+        reducer([
+          {
+            type: 'user_left',
+            data: undefined,
+            id: connection.userId,
+          },
+        ]);
       }
 
       return connection.terminate();
@@ -130,3 +134,105 @@ const interval = setInterval(() => {
 wsServer.on('close', () => {
   clearInterval(interval);
 });
+
+/*
+
+        connection.send(
+          serialize({
+            type: 'reg',
+            data: {
+              error: false,
+              errorText: '',
+              index: userId,
+              name: parsedMessage.data.name,
+            },
+          }),
+        );
+
+        connection.send(
+          serialize({
+            type: 'create_game',
+            data: {
+              idGame: 100,
+              idPlayer: 10,
+            },
+          }),
+        );
+
+        connection.send(
+          serialize({
+            type: 'start_game',
+            data: {
+              ships: [
+                {
+                  position: {
+                    x: 1,
+                    y: 1,
+                  },
+                  type: 'small',
+                  direction: true,
+                  length: 1,
+                },
+              ],
+              currentPlayerIndex: 10,
+            },
+          }),
+        );
+
+        connection.send(
+          serialize({
+            type: 'attack',
+            data: {
+              currentPlayer: userId,
+              position: {
+                x: 1,
+                y: 1,
+              },
+              status: 'killed',
+            },
+          }),
+        );
+
+        connection.send(
+          serialize({
+            type: 'attack',
+            data: {
+              currentPlayer: userId,
+              position: {
+                x: 2,
+                y: 1,
+              },
+              status: 'killed',
+            },
+          }),
+        );
+
+        connection.send(
+          serialize({
+            type: 'attack',
+            data: {
+              currentPlayer: 10,
+              position: {
+                x: 1,
+                y: 1,
+              },
+              status: 'killed',
+            },
+          }),
+        );
+
+        connection.send(
+          serialize({
+            type: 'attack',
+            data: {
+              currentPlayer: 10,
+              position: {
+                x: 2,
+                y: 1,
+              },
+              status: 'killed',
+            },
+          }),
+        );
+
+        */
