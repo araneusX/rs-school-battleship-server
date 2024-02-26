@@ -49,4 +49,12 @@ export type RandomAttackEvent = BaseEvent<
   }
 >;
 
-export type GameEvent = CreateGameEvent | AddShipEvent | AttackEvent | RandomAttackEvent | StartGameEvent;
+export type SinglePlayEvent = BaseEvent<'single_play'>;
+
+export type GameEvent =
+  | CreateGameEvent
+  | AddShipEvent
+  | AttackEvent
+  | RandomAttackEvent
+  | StartGameEvent
+  | SinglePlayEvent;

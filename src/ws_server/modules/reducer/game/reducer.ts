@@ -2,14 +2,21 @@ import { FieldStatus } from '../../../constants/FieldStatus.js';
 import { GameEvent, ReducerEvents } from '../../../types/index.js';
 import { gameStorage, logger } from '../../index.js';
 import { ScopeReducer } from '../types.js';
-import { checkFieldDefeated, createEmptyField, createGame, getRandomAttackPosition, getShipStatus } from './utils.js';
+import {
+  checkFieldDefeated,
+  createEmptyField,
+  createGame,
+  createRandomShips,
+  getRandomAttackPosition,
+  getShipStatus,
+} from './utils.js';
 
 export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
   const reducerEvents = events as ReducerEvents<GameEvent>;
 
   return reducerEvents.map((event) => {
     switch (event.type) {
-      case 'create_game':
+      case 'create_game': {
         const newGame = gameStorage.addItem(createGame(event.data.playerIds));
 
         sendToClient(
@@ -34,7 +41,20 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
           [newGame.users[1]],
         );
 
+        if (newGame.users.includes(-1)) {
+          return {
+            type: 'add_ships',
+            data: {
+              indexPlayer: -1,
+              gameId: newGame.id,
+              ships: createRandomShips(),
+            },
+            id: -1,
+          };
+        }
+
         break;
+      }
       case 'add_ships':
         const { gameId } = event.data;
         const game = gameStorage.getItemById(gameId);
@@ -418,6 +438,17 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
           },
           id: event.id,
         };
+      }
+      case 'single_play': {
+        return [
+          {
+            type: 'create_game',
+            data: {
+              playerIds: [event.id, -1],
+            },
+            id: event.id,
+          },
+        ];
       }
       default:
         break;

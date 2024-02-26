@@ -1,5 +1,6 @@
 import { FieldStatus } from '../../../constants/FieldStatus.js';
 import { Field, Game } from '../../../types/general.js';
+import { AddShipEvent } from '../../../types/index.js';
 
 type Position = { x: number; y: number };
 
@@ -189,4 +190,76 @@ export const getRandomAttackPosition = (field: Field) => {
   const position = positions[Math.floor(Math.random() * positions.length)] as Position | undefined;
 
   return position;
+};
+
+export const randomIdx = (length: number) => Math.floor(Math.random() * length);
+
+type Ship = AddShipEvent['data']['ships'];
+
+const shipTypes: Ship[number]['type'][] = ['huge', 'large', 'medium', 'small'];
+
+export const createRandomShips = (): Ship => {
+  const ships: Ship = [];
+
+  for (let typeIdx = 0; typeIdx < shipTypes.length; typeIdx++) {
+    for (let counter = 0; counter < typeIdx + 1; counter++) {
+      ships.push({
+        type: shipTypes[typeIdx],
+        direction: !!Math.round(Math.random()),
+        length: shipTypes.length - typeIdx,
+        position: {
+          x: randomIdx(10),
+          y: randomIdx(10),
+        },
+      });
+    }
+  }
+
+  let emptyFields = createEmptyField().flatMap((row, x) => row.map((_, y) => `${x}:${y}`));
+
+  const placeShip = (tryFields: string[], ship: AddShipEvent['data']['ships'][number]) => {
+    const [x, y] = tryFields[randomIdx(tryFields.length)].split(':').map((value) => Number(value));
+
+    const tryToPlace = () => {
+      const currentEmptyFields = new Set(tryFields);
+      const { direction, length } = ship;
+      for (let offset = 0; offset < length; offset++) {
+        const cell = direction ? { x, y: y + offset } : { x: x + offset, y };
+
+        if (!currentEmptyFields.has(`${cell.x}:${cell.y}`)) {
+          throw new Error();
+        }
+
+        currentEmptyFields.delete(`${cell.x}:${cell.y}`);
+      }
+
+      ship.position = { x, y };
+
+      emptyFields = [...currentEmptyFields];
+    };
+
+    try {
+      tryToPlace();
+    } catch {
+      try {
+        ship.direction = !ship.direction;
+        tryToPlace();
+      } catch {
+        const newFields = tryFields.filter((value) => value !== `${x}:${y}`);
+        if (newFields.length) {
+          placeShip(newFields, ship);
+        } else {
+          throw new Error();
+        }
+      }
+    }
+  };
+
+  try {
+    ships.forEach((ship) => placeShip(emptyFields, ship));
+  } catch {
+    return createRandomShips();
+  }
+
+  return ships;
 };

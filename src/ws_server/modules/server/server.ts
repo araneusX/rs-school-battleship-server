@@ -19,7 +19,7 @@ const sendToCLient: SendToClient = (message, privacy) => {
   logger.log('Send ', message.type);
   const clients = privacy
     ? privacy
-        .filter((userId): userId is number => typeof userId === 'number')
+        .filter((userId): userId is number => typeof userId === 'number' && userId !== -1)
         .flatMap((userId) => [...(userConnections.get(userId) ?? [])])
     : [...wsServer.clients];
 
@@ -48,8 +48,6 @@ wsServer.on('connection', (socket) => {
   connection.on('message', (rawMessage) => {
     try {
       const message = JSON.parse(rawMessage.toString());
-
-      console.log(message);
 
       const parsedMessage = {
         type: message.type,
@@ -123,8 +121,6 @@ const interval = setInterval(() => {
     const connection = socket as Connection;
 
     if (connection.isAlive === false) {
-      //TODO! IMPLEMENT CODE HERE
-
       if (connection.userId !== undefined) {
         const userConnectionSet = userConnections.get(connection.userId);
         userConnectionSet?.delete(connection);
@@ -149,105 +145,3 @@ const interval = setInterval(() => {
 wsServer.on('close', () => {
   clearInterval(interval);
 });
-
-/*
-
-        connection.send(
-          serialize({
-            type: 'reg',
-            data: {
-              error: false,
-              errorText: '',
-              index: userId,
-              name: parsedMessage.data.name,
-            },
-          }),
-        );
-
-        connection.send(
-          serialize({
-            type: 'create_game',
-            data: {
-              idGame: 100,
-              idPlayer: 10,
-            },
-          }),
-        );
-
-        connection.send(
-          serialize({
-            type: 'start_game',
-            data: {
-              ships: [
-                {
-                  position: {
-                    x: 1,
-                    y: 1,
-                  },
-                  type: 'small',
-                  direction: true,
-                  length: 1,
-                },
-              ],
-              currentPlayerIndex: 10,
-            },
-          }),
-        );
-
-        connection.send(
-          serialize({
-            type: 'attack',
-            data: {
-              currentPlayer: userId,
-              position: {
-                x: 1,
-                y: 1,
-              },
-              status: 'killed',
-            },
-          }),
-        );
-
-        connection.send(
-          serialize({
-            type: 'attack',
-            data: {
-              currentPlayer: userId,
-              position: {
-                x: 2,
-                y: 1,
-              },
-              status: 'killed',
-            },
-          }),
-        );
-
-        connection.send(
-          serialize({
-            type: 'attack',
-            data: {
-              currentPlayer: 10,
-              position: {
-                x: 1,
-                y: 1,
-              },
-              status: 'killed',
-            },
-          }),
-        );
-
-        connection.send(
-          serialize({
-            type: 'attack',
-            data: {
-              currentPlayer: 10,
-              position: {
-                x: 2,
-                y: 1,
-              },
-              status: 'killed',
-            },
-          }),
-        );
-
-        */
