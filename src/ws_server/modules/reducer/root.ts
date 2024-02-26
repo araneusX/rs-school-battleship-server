@@ -1,5 +1,5 @@
 import { AppEvent, UnknownEvent } from '../../types/events/general.js';
-import { gameReducer } from './game.js';
+import { gameReducer } from './game/index.js';
 import { roomReducer } from './room.js';
 import { SendToClient } from '../../types/index.js';
 import { userReducer } from './user.js';
