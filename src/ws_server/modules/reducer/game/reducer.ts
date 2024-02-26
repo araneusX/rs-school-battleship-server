@@ -2,7 +2,7 @@ import { FieldStatus } from '../../../constants/FieldStatus.js';
 import { GameEvent, ReducerEvents } from '../../../types/index.js';
 import { gameStorage, logger } from '../../index.js';
 import { ScopeReducer } from '../types.js';
-import { checkFieldDefeated, createEmptyField, createGame, getShipStatus } from './utils.js';
+import { checkFieldDefeated, createEmptyField, createGame, getRandomAttackPosition, getShipStatus } from './utils.js';
 
 export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
   const reducerEvents = events as ReducerEvents<GameEvent>;
@@ -168,8 +168,6 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
         const target = game.fields[enemyIndex][x][y];
 
         const gameFields = [...game.fields] as typeof game.fields;
-
-        console.log({ target, player: event.id, turn: game.turn });
 
         switch (target) {
           case FieldStatus.Empty: {
@@ -383,9 +381,44 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
         }
         break;
       }
-      case 'randomAttack':
-        break;
+      case 'randomAttack': {
+        const { gameId } = event.data;
+        const game = gameStorage.getItemById(gameId);
 
+        if (!game) {
+          logger.error(`The game with gameId: ${gameId} does not exists`);
+          break;
+        }
+
+        const playerIndex = game.users.findIndex((id) => id === event.id);
+        const enemyIndex = Number(!playerIndex);
+        const enemyField = game.fields[enemyIndex];
+
+        const position = getRandomAttackPosition(enemyField);
+
+        if (!position) {
+          sendToClient(
+            {
+              type: 'turn',
+              data: {
+                currentPlayer: game.users[enemyIndex],
+              },
+            },
+            game.users,
+          );
+          break;
+        }
+
+        return {
+          type: 'attack',
+          data: {
+            gameId,
+            indexPlayer: event.id,
+            ...position,
+          },
+          id: event.id,
+        };
+      }
       default:
         break;
     }
