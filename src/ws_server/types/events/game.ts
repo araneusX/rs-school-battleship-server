@@ -49,6 +49,14 @@ export type RandomAttackEvent = BaseEvent<
   }
 >;
 
+export type NextTurnEvent = BaseEvent<
+  'next_turn',
+  {
+    gameId: number;
+    nextPlayer: number;
+  }
+>;
+
 export type SinglePlayEvent = BaseEvent<'single_play'>;
 
 export type GameEvent =
@@ -57,4 +65,5 @@ export type GameEvent =
   | AttackEvent
   | RandomAttackEvent
   | StartGameEvent
-  | SinglePlayEvent;
+  | SinglePlayEvent
+  | NextTurnEvent;

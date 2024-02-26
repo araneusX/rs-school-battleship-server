@@ -39,7 +39,7 @@ export const createGame = (users: [number, number]): Omit<Game, 'id'> => ({
   fields: [createEmptyField(), createEmptyField()],
   ships: [],
   users,
-  turn: users[Math.round(Math.random())],
+  turn: users.includes(-1) ? users.find((id) => id !== -1)! : users[Math.round(Math.random())],
 });
 
 export const getShipStatus = (field: Field, cell: Position) => {

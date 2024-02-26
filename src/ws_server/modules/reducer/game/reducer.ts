@@ -157,17 +157,14 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
           },
           [game.users[1]],
         );
-
-        sendToClient(
-          {
-            type: 'turn',
-            data: {
-              currentPlayer: game.turn,
-            },
+        return {
+          type: 'next_turn',
+          data: {
+            gameId: game.id,
+            nextPlayer: game.turn,
           },
-          game.users,
-        );
-        break;
+          id: event.id,
+        };
       }
       case 'attack': {
         const { gameId, x, y } = event.data;
@@ -213,17 +210,14 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
               game.users,
             );
 
-            sendToClient(
-              {
-                type: 'turn',
-                data: {
-                  currentPlayer: updatedGame.turn,
-                },
+            return {
+              type: 'next_turn',
+              data: {
+                gameId: game.id,
+                nextPlayer: updatedGame.turn,
               },
-              game.users,
-            );
-
-            break;
+              id: event.id,
+            };
           }
           case FieldStatus.Ship: {
             const status = getShipStatus(game.fields[enemyIndex], { x, y });
@@ -305,17 +299,14 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
               };
             }
 
-            sendToClient(
-              {
-                type: 'turn',
-                data: {
-                  currentPlayer: event.id,
-                },
+            return {
+              type: 'next_turn',
+              data: {
+                gameId: game.id,
+                nextPlayer: event.id,
               },
-              [event.id],
-            );
-
-            break;
+              id: event.id,
+            };
           }
           case FieldStatus.Miss: {
             const updatedGame = gameStorage.updateItem(gameId, {
@@ -323,17 +314,14 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
               turn: game.users[enemyIndex],
             });
 
-            sendToClient(
-              {
-                type: 'turn',
-                data: {
-                  currentPlayer: updatedGame.turn,
-                },
+            return {
+              type: 'next_turn',
+              data: {
+                gameId: game.id,
+                nextPlayer: updatedGame.turn,
               },
-              game.users,
-            );
-
-            break;
+              id: event.id,
+            };
           }
           case FieldStatus.Kill: {
             sendToClient(
@@ -350,16 +338,15 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
               },
               game.users,
             );
-            sendToClient(
-              {
-                type: 'turn',
-                data: {
-                  currentPlayer: event.id,
-                },
+
+            return {
+              type: 'next_turn',
+              data: {
+                gameId: game.id,
+                nextPlayer: event.id,
               },
-              [event.id],
-            );
-            break;
+              id: event.id,
+            };
           }
           case FieldStatus.Shot: {
             sendToClient(
@@ -376,28 +363,25 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
               },
               game.users,
             );
-            sendToClient(
-              {
-                type: 'turn',
-                data: {
-                  currentPlayer: event.id,
-                },
+
+            return {
+              type: 'next_turn',
+              data: {
+                gameId: game.id,
+                nextPlayer: event.id,
               },
-              [event.id],
-            );
-            break;
+              id: event.id,
+            };
           }
           default:
-            sendToClient(
-              {
-                type: 'turn',
-                data: {
-                  currentPlayer: event.id,
-                },
+            return {
+              type: 'next_turn',
+              data: {
+                gameId: game.id,
+                nextPlayer: event.id,
               },
-              [event.id],
-            );
-            break;
+              id: event.id,
+            };
         }
         break;
       }
@@ -417,16 +401,14 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
         const position = getRandomAttackPosition(enemyField);
 
         if (!position) {
-          sendToClient(
-            {
-              type: 'turn',
-              data: {
-                currentPlayer: game.users[enemyIndex],
-              },
+          return {
+            type: 'next_turn',
+            data: {
+              gameId: game.id,
+              nextPlayer: game.users[enemyIndex],
             },
-            game.users,
-          );
-          break;
+            id: event.id,
+          };
         }
 
         return {
@@ -449,6 +431,36 @@ export const gameReducer: ScopeReducer = (events, { sendToClient }) => {
             id: event.id,
           },
         ];
+      }
+      case 'next_turn': {
+        const { gameId } = event.data;
+        const game = gameStorage.getItemById(gameId);
+
+        if (!game) {
+          logger.error(`The game with gameId: ${gameId} does not exists`);
+          break;
+        }
+
+        sendToClient(
+          {
+            type: 'turn',
+            data: {
+              currentPlayer: event.data.nextPlayer,
+            },
+          },
+          game.users,
+        );
+
+        if (event.data.nextPlayer === -1) {
+          return {
+            type: 'randomAttack',
+            data: {
+              gameId,
+              indexPlayer: -1,
+            },
+            id: -1,
+          };
+        }
       }
       default:
         break;
