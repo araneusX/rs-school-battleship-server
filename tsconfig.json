@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es6",                          
+    "module": "NodeNext",                    
+    "lib": ["es6", "es2022"],                     
+    "outDir": "backend",                          
+    "rootDir": "./",
+    "strict": true,         
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+  },
+  "include": ["*.ts", "*.js", "**/*.ts", "**/*.js", "src/ws_server/modules/storage/storages"],
+  "exclude": ["front/**/*"],
+}
