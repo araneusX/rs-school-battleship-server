@@ -7,6 +7,13 @@ export type CreateGameEvent = BaseEvent<
   }
 >;
 
+export type StartGameEvent = BaseEvent<
+  'start_game',
+  {
+    gameId: number;
+  }
+>;
+
 export type AddShipEvent = BaseEvent<
   'add_ships',
   {
@@ -42,4 +49,4 @@ export type RandomAttackEvent = BaseEvent<
   }
 >;
 
-export type GameEvent = CreateGameEvent | AddShipEvent | AttackEvent | RandomAttackEvent;
+export type GameEvent = CreateGameEvent | AddShipEvent | AttackEvent | RandomAttackEvent | StartGameEvent;

@@ -1,5 +1,6 @@
 import readline from 'readline';
 import { Storage } from '../storage/Storage.js';
+import { Game } from '../../types/general.js';
 
 let isUserInteractionEnabled = false;
 
@@ -33,6 +34,20 @@ if (process.env.LOGGER) {
           return;
         }
 
+        if (key === 'game') {
+          (items as Game[]).forEach((item) => {
+            console.log('ID =', item.id);
+            console.log('');
+            console.log('PLAYER1: id =', item.users[0]);
+            console.log(item.fields[0].map((row) => row.join(' ')).join('\n'));
+            console.log('');
+            console.log('PLAYER2: id =', item.users[1]);
+            console.log(item.fields[1].map((row) => row.join(' ')).join('\n'));
+          });
+
+          return;
+        }
+
         console.table(
           items.map((item) => {
             if (item && typeof item === 'object' && 'id' in item) {
@@ -51,6 +66,8 @@ if (process.env.LOGGER) {
             return item;
           }),
         );
+
+        console.log('');
       });
     } catch {}
   }).on('SIGINT', () => {
@@ -66,7 +83,7 @@ export const logger = {
       inviteUserToInteraction();
     }
   },
-  success: (...messages: string[]) => {
+  created: (...messages: string[]) => {
     if (process.env.LOGGER) {
       console.log('\x1b[92m%s\x1b[0m', ...messages);
       inviteUserToInteraction();

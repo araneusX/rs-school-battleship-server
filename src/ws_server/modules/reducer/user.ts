@@ -1,4 +1,5 @@
 import { ReducerEvents, UserEvent } from '../../types/index.js';
+import { logger } from '../index.js';
 import { ScopeReducer } from './types.js';
 
 export const userReducer: ScopeReducer = (events) => {
@@ -7,6 +8,7 @@ export const userReducer: ScopeReducer = (events) => {
   return reducerEvents.map((event) => {
     switch (event.type) {
       case 'user_joined':
+        logger.log('joined');
         return [
           {
             type: 'cast_room_info',

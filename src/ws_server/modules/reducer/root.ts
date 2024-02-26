@@ -3,6 +3,7 @@ import { gameReducer } from './game.js';
 import { roomReducer } from './room.js';
 import { SendToClient } from '../../types/index.js';
 import { userReducer } from './user.js';
+import { winnersReducer } from './winners.js';
 
 export const createReducer = (sendToClient: SendToClient) => {
   const utils = { sendToClient };
@@ -12,7 +13,12 @@ export const createReducer = (sendToClient: SendToClient) => {
       return;
     }
 
-    const nextTickEvents = [...gameReducer(events, utils), ...roomReducer(events, utils), userReducer(events, utils)]
+    const nextTickEvents = [
+      ...gameReducer(events, utils),
+      ...roomReducer(events, utils),
+      ...userReducer(events, utils),
+      ...winnersReducer(events, utils),
+    ]
       .flat()
       .filter((event): event is AppEvent => !!event);
 

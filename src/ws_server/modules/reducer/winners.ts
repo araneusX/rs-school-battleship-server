@@ -27,6 +27,7 @@ export const winnersReducer: ScopeReducer = (events, { sendToClient }) => {
           data: undefined,
           id: event.id,
         };
+
       case 'cast_winners_info':
         sendToClient({
           type: 'update_winners',

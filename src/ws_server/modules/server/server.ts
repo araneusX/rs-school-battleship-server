@@ -16,6 +16,7 @@ const userConnections = new Map<number, Set<Connection>>();
 export const wsServer = new WebSocketServer({ port: SETTINGS.PORT });
 
 const sendToCLient: SendToClient = (message, privacy) => {
+  logger.log('Send ', message.type);
   const clients = privacy
     ? privacy
         .filter((userId): userId is number => typeof userId === 'number')
@@ -48,9 +49,11 @@ wsServer.on('connection', (socket) => {
     try {
       const message = JSON.parse(rawMessage.toString());
 
+      console.log(message);
+
       const parsedMessage = {
         type: message.type,
-        data: JSON.parse(message.data),
+        data: message.data ? JSON.parse(message.data) : null,
       } as IncomeMessage;
 
       if (parsedMessage.type === 'reg') {
@@ -80,11 +83,23 @@ wsServer.on('connection', (socket) => {
 
         connection.userId = userId;
 
+        connection.send(
+          serialize({
+            type: 'reg',
+            data: {
+              error: false,
+              errorText: '',
+              index: 0,
+              name: parsedMessage.data.name,
+            },
+          }),
+        );
+
         reducer([
           {
             type: 'user_joined',
             data: undefined,
-            id: connection.userId,
+            id: userId,
           },
         ]);
       } else if (connection.userId) {

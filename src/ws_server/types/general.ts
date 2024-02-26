@@ -25,6 +25,7 @@ export type Game = {
   users: [id: number, id: number];
   ships: [ships?: Ships, ships?: Ships];
   fields: [field: Field, field: Field];
+  turn: number;
 };
 
 export type Winner = {

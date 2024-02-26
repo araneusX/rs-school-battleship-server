@@ -1,6 +1,6 @@
 import { createHash } from 'crypto';
 import { RegEvent } from '../../types/index.js';
-import { authStorage } from '../index.js';
+import { authStorage, logger } from '../index.js';
 
 export const auth = (data: RegEvent['data']) => {
   const user = authStorage.getItemMatch({ name: data.name });
@@ -12,13 +12,18 @@ export const auth = (data: RegEvent['data']) => {
   })();
 
   if (!user) {
-    return authStorage.addItem({
+    const newUserId = authStorage.addItem({
       name: data.name,
       password: passwordHash,
     }).id;
+
+    logger.created(`Created an user with id: ${newUserId}.`);
+
+    return newUserId;
   }
 
   if (user.password === passwordHash) {
+    logger.log(`User id: ${user.id} logged in.`);
     return user.id;
   }
 

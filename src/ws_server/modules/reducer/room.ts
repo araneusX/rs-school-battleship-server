@@ -16,7 +16,7 @@ export const roomReducer: ScopeReducer = (events, { sendToClient }) => {
             users: [event.id],
           });
 
-          logger.log(`User id: ${event.id} created a room with id: ${room.id}`);
+          logger.created(`User id: ${event.id} created a room with id: ${room.id}`);
 
           return {
             type: 'cast_room_info',
@@ -54,18 +54,22 @@ export const roomReducer: ScopeReducer = (events, { sendToClient }) => {
 
           logger.log(`Add second user id: ${id} in the room id: ${event.data.indexRoom}`);
 
+          const usersRoomIds = roomStorage
+            .findAll(({ users }) => users.includes(userInRoom) || users.includes(event.id))
+            .map(({ id }) => id);
+
           return [
             {
               type: 'create_game',
               data: {
-                playerIds: room.users as [number, number],
+                playerIds: [userInRoom, id],
               },
               id: event.id,
             },
             {
-              type: 'delete_room',
+              type: 'delete_rooms',
               data: {
-                roomId: room.id,
+                roomIds: usersRoomIds,
               },
               id: event.id,
             },
@@ -82,9 +86,9 @@ export const roomReducer: ScopeReducer = (events, { sendToClient }) => {
 
           if (users.length === 0) {
             return {
-              type: 'delete_room',
+              type: 'delete_rooms',
               data: {
-                roomId: room.id,
+                roomIds: [room.id],
               },
               id: event.id,
             };
@@ -105,8 +109,8 @@ export const roomReducer: ScopeReducer = (events, { sendToClient }) => {
         };
       }
 
-      case 'delete_room': {
-        roomStorage.deleteItem(event.data.roomId);
+      case 'delete_rooms': {
+        event.data.roomIds.forEach((roomId) => roomStorage.deleteItem(roomId));
 
         return {
           type: 'cast_room_info',

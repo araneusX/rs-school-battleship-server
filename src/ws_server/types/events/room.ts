@@ -12,9 +12,9 @@ export type AddUserToRoomEvent = BaseEvent<
 export type RemoveUserFromRoomEvent = BaseEvent<'remove_user_from_room'>;
 
 export type DeleteRoomEvent = BaseEvent<
-  'delete_room',
+  'delete_rooms',
   {
-    roomId: number;
+    roomIds: number[];
   }
 >;
 
