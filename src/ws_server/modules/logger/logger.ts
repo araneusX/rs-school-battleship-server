@@ -38,6 +38,8 @@ if (process.env.LOGGER) {
           (items as Game[]).forEach((item) => {
             console.log('ID =', item.id);
             console.log('');
+            console.log('TURN: id =', item.turn);
+            console.log('');
             console.log('PLAYER1: id =', item.users[0]);
             console.log(item.fields[0].map((row) => row.join(' ')).join('\n'));
             console.log('');

@@ -3,6 +3,6 @@ export enum FieldStatus {
   Empty,
   Ship,
   Miss,
-  Hit,
+  Shot,
   Kill,
 }
